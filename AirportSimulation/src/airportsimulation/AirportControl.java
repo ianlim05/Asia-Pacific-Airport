@@ -26,7 +26,9 @@ public class AirportControl {
             wait();
         }
 
-        if (isEmergency) emergencyWaiting--;
+        if (isEmergency) {
+            emergencyWaiting--;
+        }
         
         runwayBusy = true;
         planesInAirport++;

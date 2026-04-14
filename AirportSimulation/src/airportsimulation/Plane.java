@@ -32,35 +32,48 @@ class Plane extends Thread{
             int gateId = atc.atcRequestLanding(getName(), isEmergency);
             System.out.println("[" + getName() + "] Landing on Runway 1...");
             Thread.sleep(500); // Physical landing
-            
+
             System.out.println("[" + getName() + "] Coasting to Gate " + (gateId + 1) + ".");
             atc.atcClearRunway(getName());
-            
+
             stats.recordPlane(System.currentTimeMillis() - arrivalTime, passengers);
 
             // 2. TRUE Concurrent Gate Activities (3 Threads)
             Thread refuel = new Thread(() -> {
-                try { truck.useTruck(getName()); } catch (InterruptedException e) {}
+                try {
+                    truck.useTruck(getName());
+                } catch (InterruptedException e) {
+                }
             }, getName() + "-Refueler");
 
             Thread passHandler = new Thread(() -> {
                 System.out.println("[" + getName() + "] Handling " + passengers + " passengers.");
-                try { Thread.sleep(800); } catch (InterruptedException e) {}
+                try {
+                    Thread.sleep(800);
+                } catch (InterruptedException e) {
+                }
             }, getName() + "-PassHandler");
 
             Thread cleaning = new Thread(() -> {
                 System.out.println("[" + getName() + "] Cleaning/Restocking cabin.");
-                try { Thread.sleep(600); } catch (InterruptedException e) {}
+                try {
+                    Thread.sleep(600);
+                } catch (InterruptedException e) {
+                }
             }, getName() + "-Cleaners");
 
-            refuel.start(); passHandler.start(); cleaning.start();
-            refuel.join(); passHandler.join(); cleaning.join();
+            refuel.start();
+            passHandler.start();
+            cleaning.start();
+            refuel.join();
+            passHandler.join();
+            cleaning.join();
 
             // 3. Undocking & Takeoff
             System.out.println("[" + getName() + "] Preparation complete. Undocking from Gate " + (gateId + 1));
             atc.atcRequestTakeoff(getName(), gateId);
             Thread.sleep(500); // Physical takeoff
-            
+
             atc.atcConfirmDeparture(gateId);
             System.out.println("[" + getName() + "] Takeoff successful. Left Airspace.");
 
