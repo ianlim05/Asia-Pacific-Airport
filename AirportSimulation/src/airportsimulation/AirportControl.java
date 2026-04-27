@@ -4,6 +4,8 @@
  */
 package airportsimulation;
 
+import java.util.concurrent.Semaphore;
+
 /**
  *
  * @author USER
@@ -11,9 +13,9 @@ package airportsimulation;
 public class AirportControl {
     private final boolean[] gates = {true, true, true}; 
     private boolean runwayBusy = false;
-    private int planesInAirport = 0;
     private int emergencyWaiting = 0;
-
+    private final Semaphore groundSlots = new Semaphore(3,true);
+            
     // ATC Role: Grants landing clearance and assigns a specific gate
     public synchronized int atcRequestLanding(String planeName, boolean isEmergency) throws InterruptedException {
         if (isEmergency) {
@@ -22,7 +24,7 @@ public class AirportControl {
         }
 
         // Logic: Wait if 3 planes in airport OR runway busy OR if a normal plane is waiting while an emergency exists
-        while (planesInAirport >= 3 || runwayBusy || (!isEmergency && emergencyWaiting > 0)) {
+        while (runwayBusy || (!isEmergency && emergencyWaiting > 0)) {
             wait();
         }
 
@@ -30,8 +32,10 @@ public class AirportControl {
             emergencyWaiting--;
         }
         
+        // acquire 1 of 3 ground slots
+        groundSlots.acquire();
+        
         runwayBusy = true;
-        planesInAirport++;
         
         // Guaranteed Gate Allocation
         for (int i = 0; i < gates.length; i++) {
@@ -61,8 +65,9 @@ public class AirportControl {
 
     public synchronized void atcConfirmDeparture(int gateId) {
         gates[gateId] = true;
-        planesInAirport--;
+        groundSlots.release();
         runwayBusy = false;
+        System.out.println("[ATC] Gate " + (gateId + 1) + " is now free.");
         notifyAll();
     }
 
