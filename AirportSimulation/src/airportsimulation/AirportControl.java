@@ -23,7 +23,7 @@ public class AirportControl {
             System.out.println("[ATC] !! EMERGENCY DECLARED by " + planeName + " (Priority Level: High) !!");
         }
 
-        // Logic: Wait if 3 planes in airport OR runway busy OR if a normal plane is waiting while an emergency exists
+        // Wait if runway busy OR if a normal plane is waiting while an emergency exists
         while (runwayBusy || (!isEmergency && emergencyWaiting > 0)) {
             wait();
         }
