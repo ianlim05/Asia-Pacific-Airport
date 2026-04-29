@@ -17,32 +17,34 @@ public class AirportControl {
     private final Semaphore groundSlots = new Semaphore(3,true);
             
     // ATC Role: Grants landing clearance and assigns a specific gate
-    public synchronized int atcRequestLanding(String planeName, boolean isEmergency) throws InterruptedException {
-        if (isEmergency) {
-            emergencyWaiting++;
-            System.out.println("[ATC] !! EMERGENCY DECLARED by " + planeName + " (Priority Level: High) !!");
-        }
-
-        // Wait if runway busy OR if a normal plane is waiting while an emergency exists
-        while (runwayBusy || (!isEmergency && emergencyWaiting > 0)) {
-            wait();
-        }
-
-        if (isEmergency) {
-            emergencyWaiting--;
-        }
-        
+    public int atcRequestLanding(String planeName, boolean isEmergency) throws InterruptedException {
         // acquire 1 of 3 ground slots
         groundSlots.acquire();
         
-        runwayBusy = true;
-        
-        // Guaranteed Gate Allocation
-        for (int i = 0; i < gates.length; i++) {
-            if (gates[i]) {
-                gates[i] = false;
-                System.out.println("[ATC] " + planeName + " cleared for Runway 1. Taxi to GATE " + (i + 1));
-                return i;
+        synchronized (this){
+            if (isEmergency) {
+                emergencyWaiting++;
+                System.out.println("[ATC] !! EMERGENCY DECLARED by " + planeName + " (Priority Level: High) !!");
+            }
+
+            // Wait if runway busy OR if a normal plane is waiting while an emergency exists
+            while (runwayBusy || (!isEmergency && emergencyWaiting > 0)) {
+                wait();
+            }
+
+            if (isEmergency) {
+                emergencyWaiting--;
+            }
+
+            runwayBusy = true;
+
+            // Guaranteed Gate Allocation
+            for (int i = 0; i < gates.length; i++) {
+                if (gates[i]) {
+                    gates[i] = false;
+                    System.out.println("[ATC] " + planeName + " cleared for Runway 1. Taxi to GATE " + (i + 1));
+                    return i;
+                }
             }
         }
         return -1; // Should never be reached due to planesInAirport check

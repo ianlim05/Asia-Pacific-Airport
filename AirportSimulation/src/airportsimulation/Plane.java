@@ -47,7 +47,7 @@ class Plane extends Thread{
             }, getName() + "-Refueler");
 
             Thread passHandler = new Thread(() -> {
-                System.out.println("[" + getName() + "] Handling " + passengers + " passengers.");
+                System.out.println("[" + getName() + "] Disembarking and boarding " + passengers + " passengers.");
                 try {
                     Thread.sleep(800);
                 } catch (InterruptedException e) {
