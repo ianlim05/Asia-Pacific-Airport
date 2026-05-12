@@ -18,7 +18,7 @@ class RefuelTruck {
         }
         isAvailable = false;
         System.out.println("[" + planeName + "] Refueling started.");
-        Thread.sleep(1500); // Simulate refueling time
+        Thread.sleep(4000); // Simulate refueling time
         isAvailable = true;
         System.out.println("[" + planeName + "] Refueling finished. Truck released.");
         notifyAll();

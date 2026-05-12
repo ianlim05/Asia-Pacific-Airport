@@ -14,21 +14,26 @@ public class AirportControl {
     private final boolean[] gates = {true, true, true}; 
     private boolean runwayBusy = false;
     private int emergencyWaiting = 0;
-    private final Semaphore groundSlots = new Semaphore(3,true);
+    private final Semaphore groundSlots = new Semaphore(3,false);
             
     // ATC Role: Grants landing clearance and assigns a specific gate
     public int atcRequestLanding(String planeName, boolean isEmergency) throws InterruptedException {
-        // acquire 1 of 3 ground slots
-        groundSlots.acquire();
-        
-        synchronized (this){
-            if (isEmergency) {
+        if (isEmergency) {
+            synchronized(this) {
                 emergencyWaiting++;
                 System.out.println("[ATC] !! EMERGENCY DECLARED by " + planeName + " (Priority Level: High) !!");
             }
-
-            // Wait if runway busy OR if a normal plane is waiting while an emergency exists
+        }
+        
+        // acquire 1 of 3 ground slots
+        groundSlots.acquire();
+        
+        synchronized (this) {
+            // Normal planes must wait if an emergency plane is currently in the queue
             while (runwayBusy || (!isEmergency && emergencyWaiting > 0)) {
+                if (!isEmergency && emergencyWaiting > 0) {
+                    System.out.println("[ATC] " + planeName + " is giving way to the Emergency Plane.");
+                }
                 wait();
             }
 
@@ -38,7 +43,6 @@ public class AirportControl {
 
             runwayBusy = true;
 
-            // Guaranteed Gate Allocation
             for (int i = 0; i < gates.length; i++) {
                 if (gates[i]) {
                     gates[i] = false;
@@ -47,7 +51,7 @@ public class AirportControl {
                 }
             }
         }
-        return -1; // Should never be reached due to planesInAirport check
+        return -1; 
     }
 
     public synchronized void atcClearRunway(String planeName) {

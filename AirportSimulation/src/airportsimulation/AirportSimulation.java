@@ -24,28 +24,29 @@ public class AirportSimulation {
 
         System.out.println("=== ASIA PACIFIC AIRPORT MANAGEMENT SYSTEM STARTING ===\n");
 
-        // STEP 1: Occupy all 3 slots (Congestion)
+        // STEP 1: Occupy all 3 ground slots/gates
         for (int i = 1; i <= 3; i++) {
             Plane p = new Plane("Plane-" + i, atc, truck, stats, false);
             fleet.add(p);
             p.start();
-            Thread.sleep(100); 
+            Thread.sleep(500); 
         }
 
-        // STEP 2: Planes 5 & 6 arrive and must wait (Congestion verified)
-        for (int i = 5; i <= 6; i++) {
+        // STEP 2: Start 2 planes that must wait in the air (Planes 4 and 5)
+        for (int i = 4; i <= 5; i++) {
             Plane p = new Plane("Plane-" + i, atc, truck, stats, false);
             fleet.add(p);
             p.start();
+            Thread.sleep(200); 
         }
 
-        // STEP 3: The Emergency Plane arrives while others are waiting
-        Thread.sleep(300);
-        Plane emergency = new Plane("Plane-4-EMG", atc, truck, stats, true);
+        // STEP 3: Plane-6 arrives as the Emergency Plane
+        Thread.sleep(500);
+        Plane emergency = new Plane("Plane-6-EMG", atc, truck, stats, true);
         fleet.add(emergency);
         emergency.start();
-
-        // STEP 4: Proper cleanup
+        
+        // STEP 4: Cleanup
         for (Plane p : fleet) {
             p.join();
         }

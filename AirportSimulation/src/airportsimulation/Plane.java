@@ -49,7 +49,7 @@ class Plane extends Thread{
             Thread passHandler = new Thread(() -> {
                 System.out.println("[" + getName() + "] Disembarking and boarding " + passengers + " passengers.");
                 try {
-                    Thread.sleep(800);
+                    Thread.sleep(3000);
                 } catch (InterruptedException e) {
                 }
             }, getName() + "-PassHandler");
@@ -57,7 +57,7 @@ class Plane extends Thread{
             Thread cleaning = new Thread(() -> {
                 System.out.println("[" + getName() + "] Cleaning/Restocking cabin.");
                 try {
-                    Thread.sleep(600);
+                    Thread.sleep(3000);
                 } catch (InterruptedException e) {
                 }
             }, getName() + "-Cleaners");
