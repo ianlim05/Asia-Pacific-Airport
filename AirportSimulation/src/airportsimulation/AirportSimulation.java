@@ -23,7 +23,8 @@ public class AirportSimulation {
         List<Plane> fleet = new ArrayList<>();
 
         System.out.println("=== ASIA PACIFIC AIRPORT MANAGEMENT SYSTEM STARTING ===\n");
-
+        truck.start();
+        
         // STEP 1: Occupy all 3 ground slots/gates
         for (int i = 1; i <= 3; i++) {
             Plane p = new Plane("Plane-" + i, atc, truck, stats, false);

@@ -8,9 +8,15 @@ package airportsimulation;
  *
  * @author USER
  */
-class RefuelTruck {
+class RefuelTruck extends Thread {
     private boolean isAvailable = true;
 
+    @Override
+    public void run() {
+        // Truck stays running throughout simulation
+        System.out.println("[RefuelTruck] Refueling truck is ready and standing by.");
+    }
+    
     public synchronized void useTruck(String planeName) throws InterruptedException {
         while (!isAvailable) {
             System.out.println("[" + planeName + "] Waiting for refueling truck...");

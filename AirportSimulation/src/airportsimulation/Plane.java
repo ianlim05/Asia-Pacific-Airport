@@ -38,7 +38,7 @@ class Plane extends Thread{
 
             stats.recordPlane(System.currentTimeMillis() - arrivalTime, passengers);
 
-            // 2. TRUE Concurrent Gate Activities (3 Threads)
+            // 2. Concurrent Gate Activities (4 Threads)
             Thread refuel = new Thread(() -> {
                 try {
                     truck.useTruck(getName());
@@ -55,19 +55,28 @@ class Plane extends Thread{
             }, getName() + "-PassHandler");
 
             Thread cleaning = new Thread(() -> {
-                System.out.println("[" + getName() + "] Cleaning/Restocking cabin.");
+                System.out.println("[" + getName() + "] Cleaning cabin.");
                 try {
                     Thread.sleep(3000);
                 } catch (InterruptedException e) {
                 }
             }, getName() + "-Cleaners");
+            
+            Thread restocking = new Thread(() -> {
+                System.out.println("[" + getName() + "] Restocking food/supplies.");
+                try {
+                    Thread.sleep(2500);
+                } catch (InterruptedException e) {}
+            }, getName() + "-Restocking");
 
             refuel.start();
             passHandler.start();
             cleaning.start();
+            restocking.start();
             refuel.join();
             passHandler.join();
             cleaning.join();
+            restocking.join();
 
             // 3. Undocking & Takeoff
             System.out.println("[" + getName() + "] Preparation complete. Undocking from Gate " + (gateId + 1));
@@ -75,7 +84,7 @@ class Plane extends Thread{
             Thread.sleep(500); // Physical takeoff
 
             atc.atcConfirmDeparture(gateId);
-            System.out.println("[" + getName() + "] Takeoff successful. Left Airspace.");
+            System.out.println("[" + getName() + "] Takeoff successful. Left the airport.");
 
         } catch (InterruptedException e) {
             System.err.println(getName() + " Error: " + e.getMessage());
