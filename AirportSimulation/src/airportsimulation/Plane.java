@@ -30,7 +30,7 @@ class Plane extends Thread{
         try {
             // 1. Landing & Coasting
             int gateId = atc.atcRequestLanding(getName(), isEmergency);
-            System.out.println("[" + getName() + "] Landing on Runway 1...");
+            System.out.println("[" + getName() + "] Landing on the runway...");
             Thread.sleep(500); // Physical landing
 
             System.out.println("[" + getName() + "] Coasting to Gate " + (gateId + 1) + ".");
@@ -83,7 +83,7 @@ class Plane extends Thread{
             atc.atcRequestTakeoff(getName(), gateId);
             Thread.sleep(500); // Physical takeoff
 
-            atc.atcConfirmDeparture(gateId);
+            atc.atcConfirmDeparture(gateId, isEmergency);
             System.out.println("[" + getName() + "] Takeoff successful. Left the airport.");
 
         } catch (InterruptedException e) {
