@@ -27,11 +27,13 @@ public class AirportControl {
             // Give waiting planes time to react
             Thread.sleep(500);
         } else {
+            boolean yielded = false;
             // Poll until permit available, give way if emergency exists
             while (!groundSlots.tryAcquire()) {
                 synchronized (this) {
-                    if (emergencyWaiting > 0) {
+                    if (emergencyWaiting > 0 && !yielded) {
                         System.out.println("[ATC] " + planeName + " is giving way to the Emergency Plane.");
+                        yielded = true;
                     }
                 }
                 Thread.sleep(500);
@@ -39,7 +41,6 @@ public class AirportControl {
             // Secondary check after acquiring permit
             synchronized (this) {
                 while (emergencyWaiting > 0) {
-                    System.out.println("[ATC] " + planeName + " is giving way to the Emergency Plane.");
                     wait();
                 }
             }
